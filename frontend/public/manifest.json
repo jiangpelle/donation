@@ -1,6 +1,6 @@
 {
-  "short_name": "捐赠系统",
-  "name": "基于智能合约的捐赠与发放系统",
+  "short_name": "ChainHeart",
+  "name": "ChainHeart - 区块链慈善捐赠平台",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#7C3AED",
   "background_color": "#ffffff"
 } 

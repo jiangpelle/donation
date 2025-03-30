@@ -1,162 +1,193 @@
 import React, { useState, useEffect } from 'react';
 import { useWeb3 } from '../context/Web3Context';
-import { ethers } from 'ethers';
 
 function Records() {
-    const { contract } = useWeb3();
-    const [donations, setDonations] = useState([]);
-    const [distributions, setDistributions] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+  const { isConnected, connectWallet } = useWeb3();
+  const [donations, setDonations] = useState([]);
+  const [distributions, setDistributions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('donations');
 
-    useEffect(() => {
-        if (contract) {
-            loadRecords();
-        }
-    }, [contract]);
+  useEffect(() => {
+    // TODO: 实现获取记录的逻辑
+    setLoading(false);
+  }, []);
 
-    const loadRecords = async () => {
-        try {
-            setLoading(true);
-            setError('');
-
-            // 加载捐赠记录
-            const donationCount = await contract.getDonationCount();
-            const donationPromises = [];
-            for (let i = 0; i < donationCount; i++) {
-                donationPromises.push(contract.getDonation(i));
-            }
-            const donationResults = await Promise.all(donationPromises);
-            const formattedDonations = donationResults.map(([donor, amount, timestamp]) => ({
-                donor,
-                amount: ethers.utils.formatEther(amount),
-                timestamp: new Date(timestamp * 1000).toLocaleString()
-            }));
-            setDonations(formattedDonations);
-
-            // 加载发放记录
-            const distributionCount = await contract.getDistributionCount();
-            const distributionPromises = [];
-            for (let i = 0; i < distributionCount; i++) {
-                distributionPromises.push(contract.getDistribution(i));
-            }
-            const distributionResults = await Promise.all(distributionPromises);
-            const formattedDistributions = distributionResults.map(([beneficiary, amount, timestamp]) => ({
-                beneficiary,
-                amount: ethers.utils.formatEther(amount),
-                timestamp: new Date(timestamp * 1000).toLocaleString()
-            }));
-            setDistributions(formattedDistributions);
-        } catch (err) {
-            setError('加载记录失败，请重试');
-            console.error('Error loading records:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">加载中...</p>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="text-center text-red-600">
-                {error}
-            </div>
-        );
-    }
-
+  if (!isConnected) {
     return (
-        <div className="space-y-8">
-            {/* 捐赠记录 */}
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        捐赠记录
-                    </h3>
-                </div>
-                <div className="border-t border-gray-200">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    捐赠者
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    金额
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    时间
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {donations.map((donation, index) => (
-                                <tr key={index}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {donation.donor}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {donation.amount} ETH
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {donation.timestamp}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {/* 发放记录 */}
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        发放记录
-                    </h3>
-                </div>
-                <div className="border-t border-gray-200">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    受益人
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    金额
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    时间
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {distributions.map((distribution, index) => (
-                                <tr key={index}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {distribution.beneficiary}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {distribution.amount} ETH
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {distribution.timestamp}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+      <div className="max-w-2xl mx-auto text-center">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">连接钱包</h2>
+        <p className="text-gray-600 mb-8">
+          请先连接您的加密货币钱包以查看记录
+        </p>
+        <button
+          onClick={connectWallet}
+          className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors"
+        >
+          连接钱包
+        </button>
+      </div>
     );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <h2 className="text-3xl font-bold text-gray-900 mb-8">交易记录</h2>
+        
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-8">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('donations')}
+              className={`${
+                activeTab === 'donations'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              捐赠记录
+            </button>
+            <button
+              onClick={() => setActiveTab('distributions')}
+              className={`${
+                activeTab === 'distributions'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              发放记录
+            </button>
+          </nav>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载中...</p>
+          </div>
+        ) : activeTab === 'donations' ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    捐赠者
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    金额
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    时间
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {donations.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-4 text-center text-gray-500">
+                      暂无捐赠记录
+                    </td>
+                  </tr>
+                ) : (
+                  donations.map((donation, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {donation.donor}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {donation.amount} ETH
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(donation.timestamp * 1000).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    受益人
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    金额
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    时间
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {distributions.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-4 text-center text-gray-500">
+                      暂无发放记录
+                    </td>
+                  </tr>
+                ) : (
+                  distributions.map((distribution, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {distribution.beneficiary}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {distribution.amount} ETH
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(distribution.timestamp * 1000).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-8 bg-white rounded-xl shadow-lg p-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          区块链记录说明
+        </h3>
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 text-blue-600 text-xl mr-3">🔍</div>
+            <div>
+              <h4 className="font-medium text-gray-900">公开透明</h4>
+              <p className="text-gray-600">
+                所有交易记录都在区块链上公开，任何人都可以查看和验证
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="flex-shrink-0 text-blue-600 text-xl mr-3">🔒</div>
+            <div>
+              <h4 className="font-medium text-gray-900">不可篡改</h4>
+              <p className="text-gray-600">
+                区块链上的记录一旦确认就无法更改，确保数据真实可靠
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <div className="flex-shrink-0 text-blue-600 text-xl mr-3">📊</div>
+            <div>
+              <h4 className="font-medium text-gray-900">实时更新</h4>
+              <p className="text-gray-600">
+                所有交易都会实时记录在区块链上，确保信息及时准确
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Records; 

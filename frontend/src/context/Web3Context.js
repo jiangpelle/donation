@@ -1,70 +1,78 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import DonationSystem from '../contracts/DonationSystem.json';
+import DonationContract from '../contracts/DonationContract.json';
 
 const Web3Context = createContext();
 
 export function Web3Provider({ children }) {
     const [account, setAccount] = useState('');
+    const [isConnected, setIsConnected] = useState(false);
     const [contract, setContract] = useState(null);
     const [provider, setProvider] = useState(null);
-    const [isConnected, setIsConnected] = useState(false);
-
-    useEffect(() => {
-        initializeWeb3();
-    }, []);
-
-    const initializeWeb3 = async () => {
-        if (window.ethereum) {
-            try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-                
-                const contract = new ethers.Contract(
-                    contractAddress,
-                    DonationSystem.abi,
-                    signer
-                );
-
-                setProvider(provider);
-                setContract(contract);
-            } catch (error) {
-                console.error('Error initializing Web3:', error);
-            }
-        } else {
-            console.error('Please install MetaMask!');
-        }
-    };
 
     const connectWallet = async () => {
-        if (window.ethereum) {
-            try {
-                const accounts = await window.ethereum.request({
-                    method: 'eth_requestAccounts'
-                });
-                setAccount(accounts[0]);
+        try {
+            if (window.ethereum) {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+                setAccount(address);
                 setIsConnected(true);
-            } catch (error) {
-                console.error('Error connecting wallet:', error);
+                setProvider(provider);
+
+                const contractAddress = DonationContract.networks[31337].address;
+                const contract = new ethers.Contract(
+                    contractAddress,
+                    DonationContract.abi,
+                    signer
+                );
+                setContract(contract);
+            } else {
+                alert('请安装 MetaMask!');
             }
+        } catch (error) {
+            console.error('连接钱包失败:', error);
+            alert('连接钱包失败，请重试');
         }
     };
 
-    const disconnectWallet = () => {
-        setAccount('');
-        setIsConnected(false);
+    const disconnectWallet = async () => {
+        try {
+            if (provider) {
+                // 清除账户状态
+                setAccount('');
+                setIsConnected(false);
+                setContract(null);
+                setProvider(null);
+            }
+        } catch (error) {
+            console.error('断开钱包连接失败:', error);
+            alert('断开钱包连接失败，请重试');
+        }
     };
 
+    useEffect(() => {
+        // 检查是否已经连接
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    // 用户断开了钱包连接
+                    disconnectWallet();
+                } else {
+                    // 用户切换了账户
+                    setAccount(accounts[0]);
+                }
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+    }, []);
+
     return (
-        <Web3Context.Provider value={{
-            account,
-            contract,
-            provider,
-            isConnected,
-            connectWallet,
-            disconnectWallet
-        }}>
+        <Web3Context.Provider value={{ account, isConnected, contract, connectWallet, disconnectWallet }}>
             {children}
         </Web3Context.Provider>
     );
