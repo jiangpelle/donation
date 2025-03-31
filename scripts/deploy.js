@@ -9,6 +9,24 @@ async function main() {
 
     console.log("捐赠系统智能合约已部署到地址:", donationSystem.address);
     console.log("合约拥有者地址:", await donationSystem.owner());
+
+    // 保存合约地址到前端配置
+    const fs = require("fs");
+    const contractsDir = "./frontend/src/contracts";
+    
+    if (!fs.existsSync(contractsDir)) {
+        fs.mkdirSync(contractsDir);
+    }
+
+    const contractConfig = {
+        address: donationSystem.address,
+        abi: JSON.parse(donationSystem.interface.format("json"))
+    };
+
+    fs.writeFileSync(
+        contractsDir + "/contract-config.json",
+        JSON.stringify(contractConfig, null, 2)
+    );
 }
 
 main()

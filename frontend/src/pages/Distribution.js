@@ -6,7 +6,7 @@ function Distribution() {
         organization: '',
         email: '',
         phone: '',
-        amount: '',
+        location: '',
         description: '',
         category: 'education'
     });
@@ -106,44 +106,39 @@ function Distribution() {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            申请金额 (ETH)
-                        </label>
-                        <div className="relative">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                所在地区
+                            </label>
                             <input
-                                type="number"
-                                name="amount"
-                                value={formData.amount}
+                                type="text"
+                                name="location"
+                                value={formData.location}
                                 onChange={handleChange}
                                 required
-                                min="0.001"
-                                step="0.000000000000000001"
+                                placeholder="例如：北京市海淀区"
                                 className="block w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                <span className="text-gray-500">ETH</span>
-                            </div>
                         </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            援助类别
-                        </label>
-                        <select
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            required
-                            className="block w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                        >
-                            <option value="education">教育援助</option>
-                            <option value="health">医疗援助</option>
-                            <option value="environment">环境保护</option>
-                            <option value="humanitarian">人道主义</option>
-                            <option value="animals">动物保护</option>
-                        </select>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                援助类别
+                            </label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                required
+                                className="block w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            >
+                                <option value="education">教育援助</option>
+                                <option value="health">医疗援助</option>
+                                <option value="environment">环境保护</option>
+                                <option value="humanitarian">人道主义</option>
+                                <option value="animals">动物保护</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
@@ -156,6 +151,7 @@ function Distribution() {
                             onChange={handleChange}
                             required
                             rows="4"
+                            placeholder="请详细描述您的援助需求..."
                             className="block w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                         />
                     </div>
@@ -165,10 +161,6 @@ function Distribution() {
                             申请说明
                         </h3>
                         <ul className="space-y-3 text-gray-700">
-                            <li className="flex items-center">
-                                <span className="text-purple-600 mr-3">✓</span>
-                                最小申请金额：0.001 ETH
-                            </li>
                             <li className="flex items-center">
                                 <span className="text-purple-600 mr-3">✓</span>
                                 申请将通过智能合约进行审核
