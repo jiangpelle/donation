@@ -17,25 +17,27 @@ function Home() {
             <span className="text-red-500 text-3xl sm:text-4xl md:text-5xl">心</span>
           </div>
         </h1>
-        <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+        <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl mb-8">
           用区块链技术连接全球爱心，让每一份善意都能精准送达
         </p>
-        {!isConnected && (
-          <div className="space-x-6">
-            <Link
-              to="/donate"
-              className="inline-block bg-purple-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-            >
-              我要捐赠
-            </Link>
-            <Link
-              to="/distribution"
-              className="inline-block bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-purple-50 transition-colors shadow-lg border border-purple-200"
-            >
-              申请援助
-            </Link>
-          </div>
-        )}
+        <div className="mt-8">
+          {!isConnected && (
+            <div className="space-y-4 sm:space-y-0 sm:space-x-4">
+              <Link
+                to="/donate"
+                className="inline-block bg-purple-600 text-white px-8 py-3 rounded-xl text-lg font-semibold hover:bg-purple-700 transition-colors shadow-lg"
+              >
+                我要捐赠
+              </Link>
+              <Link
+                to="/distribution"
+                className="inline-block bg-white text-purple-600 px-8 py-3 rounded-xl text-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg border border-purple-200"
+              >
+                申请援助
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Features Section */}

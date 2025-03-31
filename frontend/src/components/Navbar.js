@@ -7,34 +7,37 @@ function Navbar() {
     const { isConnected, account, connectWallet, disconnectWallet } = useWeb3();
 
     return (
-        <nav className="bg-white shadow-sm">
+        <nav className="bg-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
-                    <div className="flex items-center">
-                        <Logo />
+                    <div className="flex">
+                        <div className="flex-shrink-0 flex items-center">
+                            <Logo />
+                        </div>
+                        <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <Link
+                                to="/donate"
+                                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-purple-600"
+                            >
+                                捐赠
+                            </Link>
+                            <Link
+                                to="/distribution"
+                                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-purple-600"
+                            >
+                                申请援助
+                            </Link>
+                            <Link
+                                to="/records"
+                                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-purple-600"
+                            >
+                                记录
+                            </Link>
+                        </div>
                     </div>
-                    <div className="flex items-center space-x-4">
-                        <Link
-                            to="/donate"
-                            className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                            捐赠
-                        </Link>
-                        <Link
-                            to="/distribution"
-                            className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                            申请援助
-                        </Link>
-                        <Link
-                            to="/records"
-                            className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                            记录
-                        </Link>
+                    <div className="flex items-center">
                         {isConnected ? (
                             <div className="flex items-center space-x-4">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                 <span className="text-sm text-gray-600">
                                     {account.slice(0, 6)}...{account.slice(-4)}
                                 </span>

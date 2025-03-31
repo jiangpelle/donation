@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import DonationContract from '../contracts/DonationContract.json';
+import DonationContract from '../contracts/contracts/DonationSystem.sol/DonationSystem.json';
 
 const Web3Context = createContext();
 
@@ -13,15 +13,28 @@ export function Web3Provider({ children }) {
     const connectWallet = async () => {
         try {
             if (window.ethereum) {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                const signer = await provider.getSigner();
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
                 const address = await signer.getAddress();
                 setAccount(address);
                 setIsConnected(true);
                 setProvider(provider);
 
-                const contractAddress = DonationContract.networks[31337].address;
+                // 获取当前网络
+                const network = await provider.getNetwork();
+                const chainId = network.chainId;
+
+                // 根据网络选择合约地址
+                let contractAddress;
+                if (chainId === 11155111) { // Sepolia
+                    contractAddress = "YOUR_SEPOLIA_CONTRACT_ADDRESS"; // 部署到 Sepolia 后替换
+                } else if (chainId === 31337) { // Hardhat
+                    contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Hardhat 本地网络的合约地址
+                } else {
+                    throw new Error('不支持的网络，请切换到 Sepolia 测试网或本地 Hardhat 网络');
+                }
+
                 const contract = new ethers.Contract(
                     contractAddress,
                     DonationContract.abi,
